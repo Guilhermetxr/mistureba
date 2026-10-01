@@ -35,10 +35,16 @@ export function buildStatsPatch(sale, sign, increment) {
     receivables[p.settleDate] ??= {};
     receivables[p.settleDate][p.kind] = (receivables[p.settleDate][p.kind] ?? 0) + net;
   }
+  // Só manda "receivables" quando há algo: um mapa vazio com merge apaga os recebíveis do dia inteiro
+  const receivablesPatch = Object.keys(receivables).length
+    ? {
+        receivables: Object.fromEntries(
+          Object.entries(receivables).map(([d, kinds]) => [d, Object.fromEntries(Object.entries(kinds).map(([k, v]) => [k, inc(v)]))]),
+        ),
+      }
+    : {};
   return {
-    receivables: Object.fromEntries(
-      Object.entries(receivables).map(([d, kinds]) => [d, Object.fromEntries(Object.entries(kinds).map(([k, v]) => [k, inc(v)]))]),
-    ),
+    ...receivablesPatch,
     day: sale.day,
     month: sale.month,
     revenue: inc(sale.total),
