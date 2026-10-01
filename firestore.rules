@@ -1,0 +1,99 @@
+rules_version = '2';
+
+// Perfis: "admin" (dono) vê e altera tudo; "caixa" opera PDV, caixa e perdas.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function profile() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function active() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && profile().active == true; }
+    function admin() { return active() && profile().role == 'admin'; }
+    function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // Primeiro acesso: o primeiro usuário vira admin (uma única vez)
+    match /meta/bootstrap {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.adminUid == request.auth.uid;
+    }
+
+    match /users/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || admin();
+      allow create: if admin()
+        || (signedIn() && request.auth.uid == uid
+            && !exists(/databases/$(database)/documents/meta/bootstrap)
+            && getAfter(/databases/$(database)/documents/meta/bootstrap).data.adminUid == uid
+            && request.resource.data.role == 'admin');
+      allow update: if admin();
+      allow delete: if false;
+    }
+
+    // Configurações públicas (taxas, metas) — segredos ficam em /private
+    match /settings/{doc} {
+      allow read: if active();
+      allow write: if admin();
+    }
+    match /private/{doc} {
+      allow read, write: if admin();
+    }
+
+    match /paymentMethods/{id} {
+      allow read: if active();
+      allow write: if admin();
+    }
+
+    match /products/{id} {
+      allow read: if active();
+      allow write: if admin();
+    }
+
+    // O caixa só mexe no saldo de estoque (baixa por venda/perda)
+    match /ingredients/{id} {
+      allow read: if active();
+      allow create, delete: if admin();
+      allow update: if admin() || (active() && onlyChanges(['stock']));
+    }
+
+    match /costHistory/{id} {
+      allow read, write: if admin();
+    }
+
+    match /sales/{id} {
+      allow read: if active();
+      allow create: if active() && request.resource.data.userId == request.auth.uid;
+      allow update: if admin()
+        || (active() && resource.data.cashSessionId != null && onlyChanges(['status', 'cancelReason', 'canceledAt', 'canceledBy']));
+      allow delete: if false;
+    }
+
+    match /dailyStats/{day} {
+      allow read: if admin();
+      allow create, update: if active();
+      allow delete: if false;
+    }
+
+    match /cashSessions/{id} {
+      allow read: if active();
+      allow create: if active() && request.resource.data.status == 'aberto';
+      allow update: if active() && resource.data.status == 'aberto';
+      allow delete: if false;
+    }
+
+    match /stockMovements/{id} {
+      allow read: if admin();
+      allow create: if active();
+      allow update, delete: if admin();
+    }
+
+    match /purchases/{id} { allow read, write: if admin(); }
+    match /inventories/{id} { allow read, write: if admin(); }
+    match /itemAliases/{id} { allow read, write: if admin(); }
+    match /bills/{id} { allow read, write: if admin(); }
+    match /billCategories/{id} { allow read, write: if admin(); }
+    match /recurringBills/{id} { allow read, write: if admin(); }
+
+    // Escritos apenas pelas Cloud Functions (Admin SDK ignora as regras)
+    match /stoneCharges/{id} { allow read: if active(); allow write: if false; }
+    match /ifoodOrders/{id} { allow read: if admin(); allow write: if false; }
+    match /integrationLog/{id} { allow read: if admin(); allow write: if false; }
+  }
+}

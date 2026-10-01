@@ -1,0 +1,11 @@
+{
+  "name": "sistema-mistureba",
+  "private": true,
+  "description": "Sistema interno da lanchonete: PDV, caixa, CMV, estoque, financeiro, Stone e iFood (HTML/CSS/JS + Firebase).",
+  "scripts": {
+    "dev": "firebase emulators:start --project demo-mistureba --import ./.emulator-data --export-on-exit",
+    "sync": "cp public/js/costing.js public/js/stats.js functions/shared/",
+    "deploy": "firebase deploy --only hosting,firestore",
+    "deploy:functions": "npm run sync && firebase deploy --only functions"
+  }
+}

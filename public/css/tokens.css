@@ -1,0 +1,85 @@
+/* Tokens de design — única fonte de cor, espaço, tipo e movimento.
+ * Documentados em docs/design-tokens.md */
+:root {
+  /* Superfícies (papel quente, tipo comanda) */
+  --bg: #f4f1ec;
+  --surface: #fdfcfa;
+  --surface-2: #f8f6f2;
+  --sunken: #ece8e1;
+  --line: #e2ddd4;
+  --line-strong: #cfc8bc;
+
+  /* Tinta */
+  --ink: #1f1c19;
+  --ink-2: #57514a;
+  --ink-3: #8a8279;
+  --ink-inverse: #fbf8f3;
+
+  /* Marca: brasa (chapa) */
+  --brand: #d4481f;
+  --brand-strong: #b53a15;
+  --brand-soft: #fbe7df;
+
+  /* Status (reservado; sempre com ícone/rótulo) */
+  --good: #237a4b;
+  --good-soft: #e1f1e7;
+  --warn: #a86a00;
+  --warn-soft: #fbf0d6;
+  --bad: #b42318;
+  --bad-soft: #fbe4e1;
+  --info: #2a5fae;
+  --info-soft: #e3ecf8;
+
+  /* Dados */
+  --series-1: #2a78d6;
+  --grid: #e8e3da;
+
+  /* Sidebar */
+  --side-bg: #1f1c19;
+  --side-ink: #cfc8bd;
+  --side-ink-strong: #fbf8f3;
+  --side-hover: #2d2925;
+  --side-active: #3a342e;
+
+  /* Espaço (escala de 4) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+
+  /* Raio */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+
+  /* Tipo fluido (clamp entre 360px e 1440px) */
+  --font: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --t-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --t-2xl: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+
+  /* Sombra */
+  --shadow-1: 0 1px 0 rgba(31, 28, 25, 0.04), 0 1px 2px rgba(31, 28, 25, 0.06);
+  --shadow-2: 0 8px 24px rgba(31, 28, 25, 0.12), 0 2px 6px rgba(31, 28, 25, 0.06);
+  --shadow-3: 0 24px 64px rgba(31, 28, 25, 0.24);
+
+  /* Foco (box-shadow respeita border-radius) */
+  --focus: 0 0 0 3px rgba(212, 72, 31, 0.35);
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-1: 120ms;
+  --dur-2: 180ms;
+
+  --side-w: 232px;
+  --tap: 44px;
+}
